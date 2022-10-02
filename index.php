@@ -29,8 +29,8 @@
  // Variables and constants
  define('BZ_WR_TIMEZONE', "Europe/Rome");
  define('BZ_WR_WEBSERVER', "nginx");
- define('BZ_WR_COOKIE_PATH', "/");
- define('BZ_WR_COOKIE_DOMAIN', "bugs.5mode.com");
+ $BZ_WR_COOKIE_PATH = "/";
+ $BZ_WR_COOKIE_DOMAIN = "bugs.5mode.com";
 
  // SCRIPT_NAME 
  $f = filter_input(INPUT_GET, 'perl_script');
@@ -102,12 +102,16 @@
        if ($docParsing) {
          echo($row."\n");
        } else {
-//       echo("header=$row<br>");
+         //echo("header=$row<br>");
          if (mb_strpos(strtolower($row), "set-cookie: bugzilla_login=") !== false) {
            // Parsing for the UserID on the Cookie request
            $userID = explode("=", explode(";", $row)[0])[1];
            // Creating the login cookie..
-           setcookie("Bugzilla_login", $userID, time() + 999999999, BZ_WR_COOKIE_PATH, BZ_WR_COOKIE_DOMAIN, true, true);
+           $ret=@setcookie("Bugzilla_login", $userID, time() + 999999999, $BZ_WR_COOKIE_PATH, $BZ_WR_COOKIE_DOMAIN, true, true);
+           //echo("ret=$ret<br>");
+           if ($ret) {
+             $_COOKIE["Bugzilla_login"] = $userID;
+           }
          } else {
            if ((mb_strpos($row, "--------- =") === false) && (mb_strpos($row, "WARNING:") === false)) {
              header($row);
