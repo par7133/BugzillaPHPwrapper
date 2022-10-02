@@ -20,12 +20,18 @@
  *
  * index.php
  * 
- * Bugzilla PHP Wrapper description of the file.
+ * Bugzilla PHP Wrapper.
  *
  * @author Daniele Bonini <my25mb@aol.com>
  * @copyrights (c) 2016, 2024, 5 Mode
  */
  
+ // Variables and constants
+ define('BZ_WR_TIMEZONE', "Europe/Rome");
+ define('BZ_WR_WEBSERVER', "nginx");
+ define('BZ_WR_COOKIE_PATH', "/");
+ define('BZ_WR_COOKIE_DOMAIN', "bugs.5mode.com");
+
  // SCRIPT_NAME 
  $f = filter_input(INPUT_GET, 'perl_script');
  if ($f === "" || $f === "/") {
@@ -52,15 +58,15 @@
 
  // SERVER VARIABLES 
  putenv("QUERY_STRING=$s");
- putenv("local_timezone=Europe/Rome");
- putenv("SERVER_SOFTWARE=nginx");
+ putenv("local_timezone=".BZ_WR_TIMEZONE);
+ putenv("SERVER_SOFTWARE=".BZ_WR_WEBSERVER);
  putenv("SERVER_NAME=" . $_SERVER['SERVER_NAME']);
  putenv("REQUEST_METHOD=" . $_SERVER['REQUEST_METHOD']);
- //putenv("REMOTE_ADDR=".$_SERVER['REMOTE_ADDR']);
+ putenv("REMOTE_ADDR=" . $_SERVER['REMOTE_ADDR']);
  // Rebuilding the rest of $_SERVER variables environment.. 
  $serverEnvs = $_SERVER;
  foreach($serverEnvs as $key=>$val) {
-   if (($key !== "QUERY_STRING") && ($key !== "SERVER_SOFTWARE") && ($key !== "SERVER_NAME") && ($key !== "REQUEST_METHOD")) { 
+   if (($key !== "QUERY_STRING") && ($key !== "SERVER_SOFTWARE") && ($key !== "SERVER_NAME") && ($key !== "REQUEST_METHOD") && ($key !== "REMOTE_ADDR")) { 
      putenv("$key=".$val);
    }
  }
@@ -101,7 +107,7 @@
            // Parsing for the UserID on the Cookie request
            $userID = explode("=", explode(";", $row)[0])[1];
            // Creating the login cookie..
-           setcookie("Bugzilla_login", $userID, time() + 999999999, "/", "bugs.5mode.com", true, true);
+           setcookie("Bugzilla_login", $userID, time() + 999999999, BZ_WR_COOKIE_PATH, BZ_WR_COOKIE_DOMAIN, true, true);
          } else {
            if ((mb_strpos($row, "--------- =") === false) && (mb_strpos($row, "WARNING:") === false)) {
              header($row);
