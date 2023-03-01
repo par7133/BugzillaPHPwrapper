@@ -33,7 +33,8 @@
  $BZ_WR_COOKIE_DOMAIN = "bugs.5mode.com";
 
  // SCRIPT_NAME 
- $f = filter_input(INPUT_GET, 'perl_script');
+ $f = filter_input(INPUT_GET, 'perl_script')??"";
+ $f = strip_tags($f);
  if ($f === "" || $f === "/") {
    $f = "/index.cgi";
  }
